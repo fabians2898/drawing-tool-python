@@ -67,10 +67,36 @@ class Drawer:
             print('There is no canvas')
             exit()
 
+    def fill_bucket(self, position, color):
+        x = position[0]
+        y = position[1]
+
+        # check if init point is empty
+        if self.only_canvas[x][y] == ' ':
+            self.only_canvas[x][y] = color
+        else:
+            return
+
+        # # check lower neighbor
+        if x+1 < len(self.only_canvas):
+            self.fill_bucket((x+1,y), color)
+
+        # # check upper neighbor
+        if x-1 >= 0:
+            self.fill_bucket((x-1,y), color)
+
+        # check right neighbor
+        if y+1 < len(self.only_canvas[x]):
+            self.fill_bucket((x,y+1), color)
+
+        # check left neighbor
+        if y-1 >= 0:
+            self.fill_bucket((x,y-1), color)
+
     def write_canvas_file(self, canvas):
         f = open('output.txt','a+') # Not using 'with' just to simplify the example REPL session
         for row in canvas:
-            f.write(' '.join(row) + '\n')
+            f.write(''.join(row) + '\n')
         f.write('\n')
         f.close()
 
@@ -93,7 +119,11 @@ def main(file):
         elif line[0] == 'R':
             x1, y1, x2, y2 = [int(s) for s in line.split() if s.isdigit()]
             drawer.paint_rectangle(x1, y1, x2, y2)
-            drawer.write_canvas_file(drawer.only_canvas)    
+            drawer.write_canvas_file(drawer.only_canvas)
+        elif line[0] == 'B':
+            a, y, x, c = line.split(' ')
+            drawer.fill_bucket( (int(x), int(y)), c)
+            drawer.write_canvas_file(drawer.only_canvas)       
 
 if __name__ == "__main__":
     main()
